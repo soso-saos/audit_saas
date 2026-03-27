@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuditSaaS — Audit de sécurité Web</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      text-align: center;
+      max-width: 600px;
+      padding: 40px 20px;
+    }
+    .logo { font-size: 3rem; margin-bottom: 10px; }
+    h1 { font-size: 2rem; margin-bottom: 8px; color: #58a6ff; }
+    p  { color: #8b949e; margin-bottom: 32px; font-size: 1.05rem; }
+
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 32px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 14px 16px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      color: #e6edf3;
+      font-size: 1rem;
+      margin-bottom: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus { border-color: #58a6ff; }
+
+    .mode-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .mode-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      border: 2px solid #30363d;
+      background: #0d1117;
+      color: #8b949e;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+    .mode-btn input { display: none; }
+    .mode-btn:has(input:checked) {
+      border-color: #58a6ff;
+      color: #58a6ff;
+      background: #1c2a3a;
+    }
+    .mode-icon { font-size: 1.4rem; display: block; margin-bottom: 4px; }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 14px;
+      background: #238636;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button[type="submit"]:hover { background: #2ea043; }
+
+    .warning {
+      margin-top: 20px;
+      font-size: 0.8rem;
+      color: #8b949e;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="logo">🛡️</div>
+  <h1>AuditSaaS</h1>
+  <p>Analysez la sécurité de n'importe quel site web<br>en quelques secondes.</p>
+
+  <div class="card">
+    <form action="/audit" method="POST">
+      <input type="text" name="target"
+             placeholder="https://exemple.com"
+             required autofocus>
+
+      <div class="mode-group">
+        <label class="mode-btn">
+          <input type="radio" name="mode" value="simple" checked>
+          <span class="mode-icon">🔍</span>
+          Mode Simple
+          <small style="display:block;font-size:0.75rem;margin-top:4px;color:#8b949e">
+            Audit passif rapide
+          </small>
+        </label>
+        <label class="mode-btn">
+          <input type="radio" name="mode" value="advanced">
+          <span class="mode-icon">⚡</span>
+          Mode Avancé
+          <small style="display:block;font-size:0.75rem;margin-top:4px;color:#8b949e">
+            Scan complet actif
+          </small>
+        </label>
+      </div>
+
+      <button type="submit">🚀 Lancer l'audit</button>
+    </form>
+    <p class="warning">
+      ⚖️ Usage éthique uniquement — N'auditez que les sites dont vous avez l'autorisation.
+    </p>
+  </div>
+</div>
+</body>
+</html>

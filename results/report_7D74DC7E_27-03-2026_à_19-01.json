@@ -1,0 +1,604 @@
+{
+  "id": "7D74DC7E",
+  "date": "27/03/2026 à 19:01",
+  "target": "http://localhost:8080",
+  "mode": "advanced",
+  "modules_run": [
+    "HTTP Security Headers",
+    "Fichiers Publics",
+    "WHOIS / Domaine",
+    "Scan de Ports (Nmap)",
+    "Nikto — Vulnérabilités Web",
+    "Dirsearch — Répertoires Cachés",
+    "WPScan — Audit WordPress"
+  ],
+  "score": 0,
+  "grade": "F",
+  "stats": {
+    "Mineur": 0,
+    "Important": 12,
+    "Majeur": 15,
+    "Critique": 2
+  },
+  "total_findings": 29,
+  "findings": [
+    {
+      "header": "Strict-Transport-Security",
+      "label": "HSTS",
+      "description": "Force la connexion sécurisée (HTTPS)",
+      "present": false,
+      "value": null,
+      "impact": "Important",
+      "exploitability": "Facile",
+      "status": "❌ Absent",
+      "risk_level": "Majeur",
+      "penalty": 10,
+      "display": {
+        "color": "#e67e22",
+        "emoji": "🟠",
+        "label": "Élevé"
+      }
+    },
+    {
+      "header": "X-Frame-Options",
+      "label": "X-Frame-Options",
+      "description": "Protège contre le vol de clic (Clickjacking)",
+      "present": false,
+      "value": null,
+      "impact": "Important",
+      "exploitability": "Facile",
+      "status": "❌ Absent",
+      "risk_level": "Majeur",
+      "penalty": 10,
+      "display": {
+        "color": "#e67e22",
+        "emoji": "🟠",
+        "label": "Élevé"
+      }
+    },
+    {
+      "header": "X-Content-Type-Options",
+      "label": "X-Content-Type-Options",
+      "description": "Empêche la devinette de type de fichier (MIME Sniffing)",
+      "present": false,
+      "value": null,
+      "impact": "Mineur",
+      "exploitability": "Facile",
+      "status": "❌ Absent",
+      "risk_level": "Majeur",
+      "penalty": 10,
+      "display": {
+        "color": "#e67e22",
+        "emoji": "🟠",
+        "label": "Élevé"
+      }
+    },
+    {
+      "header": "Content-Security-Policy",
+      "label": "CSP",
+      "description": "Bloque l'injection de scripts malveillants (XSS)",
+      "present": false,
+      "value": null,
+      "impact": "Majeur",
+      "exploitability": "Facile",
+      "status": "❌ Absent",
+      "risk_level": "Critique",
+      "penalty": 25,
+      "display": {
+        "color": "#e74c3c",
+        "emoji": "🔴",
+        "label": "Critique"
+      }
+    },
+    {
+      "file": "robots.txt",
+      "url": "http://localhost:8080/robots.txt",
+      "present": false,
+      "sensitive_paths": [],
+      "impact": null,
+      "exploitability": null,
+      "description": "Fichier d'instructions pour les robots (Google, etc.)",
+      "status": "ℹ️  Absent (404)",
+      "risk_level": null
+    },
+    {
+      "file": "sitemap.xml",
+      "url": "http://localhost:8080/sitemap.xml",
+      "present": false,
+      "impact": null,
+      "exploitability": null,
+      "status": "ℹ️  Absent",
+      "risk_level": null
+    },
+    {
+      "file": "/.env",
+      "url": "http://localhost:8080/.env",
+      "present": false,
+      "impact": null,
+      "exploitability": null,
+      "description": "Fichier de configuration exposé (mots de passe, clés API)",
+      "status": "✅ Non accessible (HTTP 404)",
+      "risk_level": null
+    },
+    {
+      "file": "/.git/config",
+      "url": "http://localhost:8080/.git/config",
+      "present": false,
+      "impact": null,
+      "exploitability": null,
+      "description": "Dépôt Git exposé (accès au code source)",
+      "status": "✅ Non accessible (HTTP 404)",
+      "risk_level": null
+    },
+    {
+      "file": "/backup.zip",
+      "url": "http://localhost:8080/backup.zip",
+      "present": false,
+      "impact": null,
+      "exploitability": null,
+      "description": "Archive de sauvegarde accessible publiquement",
+      "status": "✅ Non accessible (HTTP 404)",
+      "risk_level": null
+    },
+    {
+      "file": "/backup.sql",
+      "url": "http://localhost:8080/backup.sql",
+      "present": false,
+      "impact": null,
+      "exploitability": null,
+      "description": "Dump de base de données accessible publiquement",
+      "status": "✅ Non accessible (HTTP 404)",
+      "risk_level": null
+    },
+    {
+      "file": "/wp-config.php.bak",
+      "url": "http://localhost:8080/wp-config.php.bak",
+      "present": false,
+      "impact": null,
+      "exploitability": null,
+      "description": "Sauvegarde de configuration WordPress exposée",
+      "status": "✅ Non accessible (HTTP 404)",
+      "risk_level": null
+    },
+    {
+      "file": "/config.php.bak",
+      "url": "http://localhost:8080/config.php.bak",
+      "present": false,
+      "impact": null,
+      "exploitability": null,
+      "description": "Sauvegarde de configuration exposée",
+      "status": "✅ Non accessible (HTTP 404)",
+      "risk_level": null
+    },
+    {
+      "file": "/error_log",
+      "url": "http://localhost:8080/error_log",
+      "present": false,
+      "impact": null,
+      "exploitability": null,
+      "description": "Journal d'erreurs exposé (révèle la structure interne)",
+      "status": "✅ Non accessible (HTTP 404)",
+      "risk_level": null
+    },
+    {
+      "label": "WHOIS",
+      "description": "Données WHOIS masquées ou inaccessibles",
+      "value": "Masqué",
+      "impact": null,
+      "exploitability": null,
+      "status": "✅ Données personnelles masquées (bonne pratique)",
+      "sensitive": false,
+      "risk_level": null
+    },
+    {
+      "label": "Port 3000 — App Web",
+      "port": 3000,
+      "protocol": "tcp",
+      "service": "ppp?",
+      "version": "",
+      "description": "Application web sur port non standard — souvent sans protection",
+      "impact": "Mineur",
+      "exploitability": "Facile",
+      "status": "🔴 Ouvert — DANGEREUX",
+      "risk_level": "Majeur",
+      "penalty": 10,
+      "display": {
+        "color": "#e67e22",
+        "emoji": "🟠",
+        "label": "Élevé"
+      }
+    },
+    {
+      "label": "Port 5000 — http (Werkzeug httpd 3.1.7 (Python 3.13.12))",
+      "port": 5000,
+      "protocol": "tcp",
+      "service": "http",
+      "version": "Werkzeug httpd 3.1.7 (Python 3.13.12)",
+      "description": "Port 5000 ouvert — service http exposé",
+      "impact": "Mineur",
+      "exploitability": "Modérée",
+      "status": "🔴 Ouvert — DANGEREUX",
+      "risk_level": "Important",
+      "penalty": 5,
+      "display": {
+        "color": "#f39c12",
+        "emoji": "🟠",
+        "label": "Moyen"
+      }
+    },
+    {
+      "label": "Port 8080 — HTTP-Alt (Apache httpd 2.4.66 ((Debian)))",
+      "port": 8080,
+      "protocol": "tcp",
+      "service": "http",
+      "version": "Apache httpd 2.4.66 ((Debian))",
+      "description": "Port HTTP alternatif — souvent un panneau d'administration",
+      "impact": "Mineur",
+      "exploitability": "Facile",
+      "status": "🔴 Ouvert — DANGEREUX",
+      "risk_level": "Majeur",
+      "penalty": 10,
+      "display": {
+        "color": "#e67e22",
+        "emoji": "🟠",
+        "label": "Élevé"
+      }
+    },
+    {
+      "label": "Port 8081 — http (Apache httpd 2.4.25 ((Debian)))",
+      "port": 8081,
+      "protocol": "tcp",
+      "service": "http",
+      "version": "Apache httpd 2.4.25 ((Debian))",
+      "description": "CVE-2017-7679 — Vulnérabilité critique connue (très ancienne version)",
+      "impact": "Critique",
+      "exploitability": "Facile",
+      "status": "🔴 Ouvert — DANGEREUX",
+      "risk_level": "Critique",
+      "penalty": 25,
+      "display": {
+        "color": "#e74c3c",
+        "emoji": "🔴",
+        "label": "Critique"
+      }
+    },
+    {
+      "label": "Port 8082 — http (nginx 1.29.7)",
+      "port": 8082,
+      "protocol": "tcp",
+      "service": "http",
+      "version": "nginx 1.29.7",
+      "description": "Port 8082 ouvert — service http exposé",
+      "impact": "Mineur",
+      "exploitability": "Modérée",
+      "status": "🔴 Ouvert — DANGEREUX",
+      "risk_level": "Important",
+      "penalty": 5,
+      "display": {
+        "color": "#f39c12",
+        "emoji": "🟠",
+        "label": "Moyen"
+      }
+    },
+    {
+      "label": "Port 8083 — http (Apache httpd 2.4.66 ((Debian)))",
+      "port": 8083,
+      "protocol": "tcp",
+      "service": "http",
+      "version": "Apache httpd 2.4.66 ((Debian))",
+      "description": "Port 8083 ouvert — service http exposé",
+      "impact": "Mineur",
+      "exploitability": "Modérée",
+      "status": "🔴 Ouvert — DANGEREUX",
+      "risk_level": "Important",
+      "penalty": 5,
+      "display": {
+        "color": "#f39c12",
+        "emoji": "🟠",
+        "label": "Moyen"
+      }
+    },
+    {
+      "label": "Port 8084 — http (Apache httpd 2.4.66 ((Debian)))",
+      "port": 8084,
+      "protocol": "tcp",
+      "service": "http",
+      "version": "Apache httpd 2.4.66 ((Debian))",
+      "description": "Port 8084 ouvert — service http exposé",
+      "impact": "Mineur",
+      "exploitability": "Modérée",
+      "status": "🔴 Ouvert — DANGEREUX",
+      "risk_level": "Important",
+      "penalty": 5,
+      "display": {
+        "color": "#f39c12",
+        "emoji": "🟠",
+        "label": "Moyen"
+      }
+    },
+    {
+      "label": "Port 8085 — http (Apache httpd 2.4.65 ((Debian)))",
+      "port": 8085,
+      "protocol": "tcp",
+      "service": "http",
+      "version": "Apache httpd 2.4.65 ((Debian))",
+      "description": "Port 8085 ouvert — service http exposé",
+      "impact": "Mineur",
+      "exploitability": "Modérée",
+      "status": "🔴 Ouvert — DANGEREUX",
+      "risk_level": "Important",
+      "penalty": 5,
+      "display": {
+        "color": "#f39c12",
+        "emoji": "🟠",
+        "label": "Moyen"
+      }
+    },
+    {
+      "label": "Port 8086 — http (Apache Tomcat (language: en))",
+      "port": 8086,
+      "protocol": "tcp",
+      "service": "http",
+      "version": "Apache Tomcat (language: en)",
+      "description": "Port 8086 ouvert — service http exposé",
+      "impact": "Mineur",
+      "exploitability": "Modérée",
+      "status": "🔴 Ouvert — DANGEREUX",
+      "risk_level": "Important",
+      "penalty": 5,
+      "display": {
+        "color": "#f39c12",
+        "emoji": "🟠",
+        "label": "Moyen"
+      }
+    },
+    {
+      "label": "[999100] /: Uncommon header(s) 'x-redirect-by' found, with contents: WordPress.",
+      "description": "Détecté par Nikto — scanner de vulnérabilités web",
+      "impact": "Mineur",
+      "exploitability": "Modérée",
+      "status": "⚠️  Détecté",
+      "source": "nikto",
+      "risk_level": "Important",
+      "penalty": 5,
+      "display": {
+        "color": "#f39c12",
+        "emoji": "🟠",
+        "label": "Moyen"
+      }
+    },
+    {
+      "label": "[600625] PHP/8.3.30 appears to be outdated (current is at least 8.5.1).",
+      "description": "Détecté par Nikto — scanner de vulnérabilités web",
+      "impact": "Important",
+      "exploitability": "Modérée",
+      "status": "⚠️  Détecté",
+      "source": "nikto",
+      "risk_level": "Important",
+      "penalty": 5,
+      "display": {
+        "color": "#f39c12",
+        "emoji": "🟠",
+        "label": "Moyen"
+      }
+    },
+    {
+      "label": "[000427] /: Link header(s) found with value(s): <http://localhost:8080/index.php?rest_route=/>; rel=\"https://api.w.org/\"...",
+      "description": "Détecté par Nikto — scanner de vulnérabilités web",
+      "impact": "Mineur",
+      "exploitability": "Modérée",
+      "status": "⚠️  Détecté",
+      "source": "nikto",
+      "risk_level": "Important",
+      "penalty": 5,
+      "display": {
+        "color": "#f39c12",
+        "emoji": "🟠",
+        "label": "Moyen"
+      }
+    },
+    {
+      "label": "[013587] /: Suggested security header missing: referrer-policy. See: https://developer.mozilla.org/en-US/docs/Web/HTTP/H...",
+      "description": "Détecté par Nikto — scanner de vulnérabilités web",
+      "impact": "Mineur",
+      "exploitability": "Facile",
+      "status": "⚠️  Détecté",
+      "source": "nikto",
+      "risk_level": "Majeur",
+      "penalty": 10,
+      "display": {
+        "color": "#e67e22",
+        "emoji": "🟠",
+        "label": "Élevé"
+      }
+    },
+    {
+      "label": "[013587] /: Suggested security header missing: permissions-policy. See: https://developer.mozilla.org/en-US/docs/Web/HTT...",
+      "description": "Détecté par Nikto — scanner de vulnérabilités web",
+      "impact": "Mineur",
+      "exploitability": "Facile",
+      "status": "⚠️  Détecté",
+      "source": "nikto",
+      "risk_level": "Majeur",
+      "penalty": 10,
+      "display": {
+        "color": "#e67e22",
+        "emoji": "🟠",
+        "label": "Élevé"
+      }
+    },
+    {
+      "label": "[013587] /: Suggested security header missing: content-security-policy. See: https://developer.mozilla.org/en-US/docs/We...",
+      "description": "Détecté par Nikto — scanner de vulnérabilités web",
+      "impact": "Mineur",
+      "exploitability": "Facile",
+      "status": "⚠️  Détecté",
+      "source": "nikto",
+      "risk_level": "Majeur",
+      "penalty": 10,
+      "display": {
+        "color": "#e67e22",
+        "emoji": "🟠",
+        "label": "Élevé"
+      }
+    },
+    {
+      "label": "[013587] /: Suggested security header missing: strict-transport-security. See: https://developer.mozilla.org/en-US/docs/...",
+      "description": "Détecté par Nikto — scanner de vulnérabilités web",
+      "impact": "Mineur",
+      "exploitability": "Facile",
+      "status": "⚠️  Détecté",
+      "source": "nikto",
+      "risk_level": "Majeur",
+      "penalty": 10,
+      "display": {
+        "color": "#e67e22",
+        "emoji": "🟠",
+        "label": "Élevé"
+      }
+    },
+    {
+      "label": "[013587] /: Suggested security header missing: x-content-type-options. See: https://developer.mozilla.org/en-US/docs/Web...",
+      "description": "Détecté par Nikto — scanner de vulnérabilités web",
+      "impact": "Mineur",
+      "exploitability": "Facile",
+      "status": "⚠️  Détecté",
+      "source": "nikto",
+      "risk_level": "Majeur",
+      "penalty": 10,
+      "display": {
+        "color": "#e67e22",
+        "emoji": "🟠",
+        "label": "Élevé"
+      }
+    },
+    {
+      "label": "[999967] /: Web Server returns a valid response with junk HTTP methods which may cause false positives.",
+      "description": "Détecté par Nikto — scanner de vulnérabilités web",
+      "impact": "Mineur",
+      "exploitability": "Modérée",
+      "status": "⚠️  Détecté",
+      "source": "nikto",
+      "risk_level": "Important",
+      "penalty": 5,
+      "display": {
+        "color": "#f39c12",
+        "emoji": "🟠",
+        "label": "Moyen"
+      }
+    },
+    {
+      "label": "[006184] /wp-links-opml.php: This WordPress script reveals the installed version.",
+      "description": "Détecté par Nikto — scanner de vulnérabilités web",
+      "impact": "Mineur",
+      "exploitability": "Modérée",
+      "status": "⚠️  Détecté",
+      "source": "nikto",
+      "risk_level": "Important",
+      "penalty": 5,
+      "display": {
+        "color": "#f39c12",
+        "emoji": "🟠",
+        "label": "Moyen"
+      }
+    },
+    {
+      "label": "[006186] /license.txt: License file found may identify site software.",
+      "description": "Détecté par Nikto — scanner de vulnérabilités web",
+      "impact": "Mineur",
+      "exploitability": "Modérée",
+      "status": "⚠️  Détecté",
+      "source": "nikto",
+      "risk_level": "Important",
+      "penalty": 5,
+      "display": {
+        "color": "#f39c12",
+        "emoji": "🟠",
+        "label": "Moyen"
+      }
+    },
+    {
+      "label": "/wp-content/",
+      "description": "Chemin accessible non référencé : /wp-content/",
+      "http_code": 200,
+      "impact": "Mineur",
+      "exploitability": "Facile",
+      "status": "✅ Accessible (HTTP 200)",
+      "risk_level": "Majeur",
+      "penalty": 10,
+      "display": {
+        "color": "#e67e22",
+        "emoji": "🟠",
+        "label": "Élevé"
+      }
+    },
+    {
+      "label": "/wp-login.php",
+      "description": "Page de connexion WordPress exposée",
+      "http_code": 200,
+      "impact": "Important",
+      "exploitability": "Facile",
+      "status": "✅ Accessible (HTTP 200)",
+      "risk_level": "Majeur",
+      "penalty": 10,
+      "display": {
+        "color": "#e67e22",
+        "emoji": "🟠",
+        "label": "Élevé"
+      }
+    },
+    {
+      "label": "/wp-admin",
+      "description": "Interface d'administration accessible",
+      "http_code": 301,
+      "impact": "Important",
+      "exploitability": "Facile",
+      "status": "↪️  Redirige (HTTP 301)",
+      "risk_level": "Majeur",
+      "penalty": 10,
+      "display": {
+        "color": "#e67e22",
+        "emoji": "🟠",
+        "label": "Élevé"
+      }
+    },
+    {
+      "label": "/wp-content",
+      "description": "Chemin accessible non référencé : /wp-content",
+      "http_code": 301,
+      "impact": "Mineur",
+      "exploitability": "Facile",
+      "status": "↪️  Redirige (HTTP 301)",
+      "risk_level": "Majeur",
+      "penalty": 10,
+      "display": {
+        "color": "#e67e22",
+        "emoji": "🟠",
+        "label": "Élevé"
+      }
+    },
+    {
+      "label": "/wp-includes",
+      "description": "Chemin accessible non référencé : /wp-includes",
+      "http_code": 301,
+      "impact": "Mineur",
+      "exploitability": "Facile",
+      "status": "↪️  Redirige (HTTP 301)",
+      "risk_level": "Majeur",
+      "penalty": 10,
+      "display": {
+        "color": "#e67e22",
+        "emoji": "🟠",
+        "label": "Élevé"
+      }
+    },
+    {
+      "label": "WPScan — Aucune faille détectée",
+      "description": "WordPress semble à jour et correctement configuré",
+      "impact": null,
+      "exploitability": null,
+      "status": "✅ Aucune faille WordPress détectée",
+      "risk_level": null
+    }
+  ]
+}

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rapport — {{ report.target }}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      padding: 40px 20px;
+    }
+    .container { max-width: 960px; margin: 0 auto; }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .header h1 { font-size: 1.5rem; color: #58a6ff; }
+    .header small { color: #8b949e; display: block; font-size: 0.85rem; }
+    .back-btn {
+      padding: 8px 16px;
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      color: #e6edf3;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back-btn:hover { background: #30363d; }
+
+    /* Score card */
+    .score-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 32px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .score-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      transition: all 0.3s;
+    }
+    .score-circle small { font-size: 0.75rem; font-weight: 400; }
+    .grade-A { background: #1a3a2a; color: #3fb950; border: 3px solid #3fb950; }
+    .grade-B { background: #1a2a3a; color: #58a6ff; border: 3px solid #58a6ff; }
+    .grade-C { background: #2d2a1a; color: #d29922; border: 3px solid #d29922; }
+    .grade-D { background: #2d1f1a; color: #f0883e; border: 3px solid #f0883e; }
+    .grade-F { background: #2d1a1a; color: #f85149; border: 3px solid #f85149; }
+
+    .score-info h2 { font-size: 1.4rem; margin-bottom: 8px; }
+    .score-info p  { color: #8b949e; font-size: 0.9rem; margin-bottom: 12px; }
+
+    .stats-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .stat-badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .stat-critique  { background: #2d1a1a; color: #f85149; }
+    .stat-majeur    { background: #2d1f1a; color: #f0883e; }
+    .stat-important { background: #2d2a1a; color: #d29922; }
+    .stat-mineur    { background: #1a2a3a; color: #58a6ff; }
+
+    /* Modules groupés */
+    .module-section {
+      margin-bottom: 28px;
+    }
+    .module-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 10px 10px 0 0;
+      cursor: pointer;
+      user-select: none;
+    }
+    .module-header:hover { background: #1c2128; }
+    .module-header h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #e6edf3;
+    }
+    .module-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .module-count {
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: #21262d;
+      color: #8b949e;
+    }
+    .module-count.has-critical { background: #2d1a1a; color: #f85149; }
+    .module-count.has-major    { background: #2d1f1a; color: #f0883e; }
+    .chevron { color: #8b949e; font-size: 0.9rem; transition: transform 0.2s; }
+    .chevron.open { transform: rotate(180deg); }
+
+    .module-body {
+      border: 1px solid #30363d;
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+      overflow: hidden;
+    }
+
+    /* Findings */
+    .finding {
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      border-bottom: 1px solid #21262d;
+    }
+    .finding:last-child { border-bottom: none; }
+    .finding:hover { background: #1c2128; }
+    .finding-left h4 { font-size: 0.9rem; margin-bottom: 3px; font-weight: 500; }
+    .finding-left p  { font-size: 0.8rem; color: #8b949e; }
+    .finding-right   { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .finding-status  { font-size: 0.82rem; color: #8b949e; }
+
+    .risk-badge {
+      padding: 3px 10px;
+      border-radius: 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .risk-Critique  { background: #2d1a1a; color: #f85149; }
+    .risk-Majeur    { background: #2d1f1a; color: #f0883e; }
+    .risk-Important { background: #2d2a1a; color: #d29922; }
+    .risk-Mineur    { background: #1a2a3a; color: #58a6ff; }
+    .risk-ok        { background: #1a3a2a; color: #3fb950; }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #8b949e;
+      font-size: 0.82rem;
+      padding-top: 20px;
+      border-top: 1px solid #21262d;
+    }
+
+    /* Résumé modules */
+    .modules-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .module-pill {
+      padding: 5px 12px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: #8b949e;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1>🛡️ Rapport d'audit de sécurité</h1>
+      <small>
+        {{ report.target }} — {{ report.date }} — ID : {{ report.id }}
+        &nbsp;|&nbsp; Mode :
+        {% if report.mode == "advanced" %}⚡ Avancé{% else %}🔍 Simple{% endif %}
+      </small>
+    </div>
+    <a href="/" class="back-btn">← Nouvel audit</a>
+  </div>
+
+  <!-- Score global -->
+  <div class="score-card">
+    <div class="score-circle grade-{{ report.grade }}">
+      {% if report.score == 0 %}0{% else %}{{ report.score }}{% endif %}
+      <small>/100</small>
+    </div>
+    <div class="score-info">
+      <h2>Grade {{ report.grade }} —
+        {% if report.grade == "A" %}Excellent
+        {% elif report.grade == "B" %}Bon
+        {% elif report.grade == "C" %}Passable
+        {% elif report.grade == "D" %}Insuffisant
+        {% else %}Critique{% endif %}
+      </h2>
+      <p>{{ report.total_findings }} vulnérabilité(s) détectée(s)
+         sur {{ report.modules_grouped | length }} module(s)</p>
+      <div class="stats-row">
+        <span class="stat-badge stat-critique">🔴 Critique : {{ report.stats.Critique }}</span>
+        <span class="stat-badge stat-majeur">🟠 Élevé : {{ report.stats.Majeur }}</span>
+        <span class="stat-badge stat-important">🟡 Moyen : {{ report.stats.Important }}</span>
+        <span class="stat-badge stat-mineur">🔵 Faible : {{ report.stats.Mineur }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modules utilisés -->
+  <div class="modules-summary">
+    {% for m in report.modules_run %}
+    <span class="module-pill">✅ {{ m }}</span>
+    {% endfor %}
+  </div>
+
+  <!-- Findings groupés par module -->
+  {% for module_name, findings in report.modules_grouped.items() %}
+
+  {% set has_vulns = findings | selectattr("risk_level") | list | length %}
+  {% set has_critique = findings | selectattr("risk_level", "equalto", "Critique") | list | length %}
+  {% set has_major = findings | selectattr("risk_level", "equalto", "Majeur") | list | length %}
+
+  <div class="module-section">
+    <div class="module-header" onclick="toggle('{{ loop.index }}')">
+      <h3>{{ module_name }}</h3>
+      <div class="module-meta">
+        <span class="module-count
+          {% if has_critique %}has-critical
+          {% elif has_major %}has-major{% endif %}">
+          {{ has_vulns }} faille(s)
+        </span>
+        <span class="chevron" id="chevron-{{ loop.index }}">▼</span>
+      </div>
+    </div>
+
+    <div class="module-body" id="body-{{ loop.index }}">
+      {% for f in findings %}
+      <div class="finding">
+        <div class="finding-left">
+          <h4>{{ f.get("label") or f.get("file") or f.get("header") or "Résultat" }}</h4>
+          <p>{{ f.get("description", "") }}</p>
+        </div>
+        <div class="finding-right">
+          <span class="finding-status">{{ f.status }}</span>
+          {% if f.risk_level %}
+            <span class="risk-badge risk-{{ f.risk_level }}">{{ f.risk_level }}</span>
+          {% else %}
+            <span class="risk-badge risk-ok">✅ OK</span>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+
+  <div class="footer">
+    Rapport généré par AuditSaaS — Usage White Hat uniquement<br>
+    <small>{{ report.date }} — ID {{ report.id }}</small>
+  </div>
+</div>
+
+<script>
+  function toggle(id) {
+    const body    = document.getElementById('body-' + id);
+    const chevron = document.getElementById('chevron-' + id);
+    const isOpen  = body.style.display !== 'none';
+    body.style.display    = isOpen ? 'none' : 'block';
+    chevron.textContent   = isOpen ? '▶' : '▼';
+  }
+</script>
+</body>
+</html>
