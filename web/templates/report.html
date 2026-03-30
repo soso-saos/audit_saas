@@ -35,6 +35,17 @@
       font-size: 0.9rem;
     }
     .back-btn:hover { background: #30363d; }
+    .download-btn {
+      padding: 8px 16px;
+      background: #238636;
+      border: 1px solid #2ea043;
+      border-radius: 6px;
+      color: white;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .download-btn:hover { background: #2ea043; }
 
     /* Score card */
     .score-card {
@@ -84,9 +95,8 @@
     .stat-mineur    { background: #1a2a3a; color: #58a6ff; }
 
     /* Modules groupés */
-    .module-section {
-      margin-bottom: 28px;
-    }
+    .module-section { margin-bottom: 28px; }
+
     .module-header {
       display: flex;
       align-items: center;
@@ -120,7 +130,6 @@
     .module-count.has-critical { background: #2d1a1a; color: #f85149; }
     .module-count.has-major    { background: #2d1f1a; color: #f0883e; }
     .chevron { color: #8b949e; font-size: 0.9rem; transition: transform 0.2s; }
-    .chevron.open { transform: rotate(180deg); }
 
     .module-body {
       border: 1px solid #30363d;
@@ -159,16 +168,6 @@
     .risk-Mineur    { background: #1a2a3a; color: #58a6ff; }
     .risk-ok        { background: #1a3a2a; color: #3fb950; }
 
-    /* Footer */
-    .footer {
-      text-align: center;
-      margin-top: 40px;
-      color: #8b949e;
-      font-size: 0.82rem;
-      padding-top: 20px;
-      border-top: 1px solid #21262d;
-    }
-
     /* Résumé modules */
     .modules-summary {
       display: flex;
@@ -184,6 +183,16 @@
       font-size: 0.8rem;
       color: #8b949e;
     }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #8b949e;
+      font-size: 0.82rem;
+      padding-top: 20px;
+      border-top: 1px solid #21262d;
+    }
   </style>
 </head>
 <body>
@@ -192,14 +201,17 @@
   <!-- Header -->
   <div class="header">
     <div>
-      <h1>🛡️ Rapport d'audit de sécurité</h1>
+      <h1>🛡️ ShieldScan — Rapport d'audit de sécurité</h1>
       <small>
         {{ report.target }} — {{ report.date }} — ID : {{ report.id }}
         &nbsp;|&nbsp; Mode :
         {% if report.mode == "advanced" %}⚡ Avancé{% else %}🔍 Simple{% endif %}
       </small>
     </div>
-    <a href="/" class="back-btn">← Nouvel audit</a>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <a href="/download/{{ report.id }}" class="download-btn">⬇️ Télécharger PDF</a>
+      <a href="/" class="back-btn">← Nouvel audit</a>
+    </div>
   </div>
 
   <!-- Score global -->
@@ -276,8 +288,8 @@
   {% endfor %}
 
   <div class="footer">
-    Rapport généré par AuditSaaS — Usage White Hat uniquement<br>
-    <small>{{ report.date }} — ID {{ report.id }}</small>
+    Rapport généré par <strong>ShieldScan</strong> — <em>Votre sécurité web, en un scan.</em><br>
+    {{ report.date }} — ID {{ report.id }}
   </div>
 </div>
 
@@ -286,8 +298,8 @@
     const body    = document.getElementById('body-' + id);
     const chevron = document.getElementById('chevron-' + id);
     const isOpen  = body.style.display !== 'none';
-    body.style.display    = isOpen ? 'none' : 'block';
-    chevron.textContent   = isOpen ? '▶' : '▼';
+    body.style.display  = isOpen ? 'none' : 'block';
+    chevron.textContent = isOpen ? '▶' : '▼';
   }
 </script>
 </body>

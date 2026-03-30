@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Rapport ShieldScan — {{ report.target }}</title>
+  <style>
+    @page {
+      margin: 2cm;
+      @top-center {
+        content: "ShieldScan — Rapport d'audit de sécurité";
+        font-size: 9pt;
+        color: #666;
+      }
+      @bottom-right {
+        content: "Page " counter(page) " / " counter(pages);
+        font-size: 9pt;
+        color: #666;
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 10pt;
+      color: #1a1a2e;
+      background: white;
+      line-height: 1.5;
+    }
+
+    /* Page de garde */
+    .cover {
+      text-align: center;
+      padding: 60px 40px;
+      border-bottom: 3px solid #58a6ff;
+      margin-bottom: 30px;
+    }
+
+    .cover .logo {
+      font-size: 48pt;
+      margin-bottom: 10px;
+    }
+
+    .cover .company {
+      font-size: 28pt;
+      font-weight: 700;
+      color: #0d1117;
+      letter-spacing: 2px;
+    }
+
+    .cover .slogan {
+      font-size: 11pt;
+      color: #58a6ff;
+      margin-bottom: 40px;
+      font-style: italic;
+    }
+
+    .cover .report-title {
+      font-size: 18pt;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 8px;
+    }
+
+    .cover .report-meta {
+      font-size: 10pt;
+      color: #555;
+    }
+
+    /* Score */
+    .score-section {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      border: 1px solid #dee2e6;
+    }
+
+    .score-circle {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 22pt;
+      font-weight: 700;
+      flex-shrink: 0;
+      border: 4px solid;
+    }
+    .score-circle small { font-size: 8pt; font-weight: 400; }
+    .grade-A { color: #28a745; border-color: #28a745; background: #d4edda; }
+    .grade-B { color: #007bff; border-color: #007bff; background: #cce5ff; }
+    .grade-C { color: #fd7e14; border-color: #fd7e14; background: #fff3cd; }
+    .grade-D { color: #dc3545; border-color: #dc3545; background: #f8d7da; }
+    .grade-F { color: #dc3545; border-color: #dc3545; background: #f8d7da; }
+
+    .score-info h2 { font-size: 14pt; margin-bottom: 6px; }
+    .score-info p  { font-size: 9pt; color: #555; margin-bottom: 8px; }
+
+    .stats-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .stat-badge {
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 8pt;
+      font-weight: 600;
+    }
+    .stat-critique  { background: #f8d7da; color: #dc3545; }
+    .stat-majeur    { background: #fff3cd; color: #fd7e14; }
+    .stat-important { background: #fff3cd; color: #856404; }
+    .stat-mineur    { background: #cce5ff; color: #004085; }
+
+    /* Modules */
+    .module-section { margin-bottom: 20px; page-break-inside: avoid; }
+
+    .module-header {
+      background: #0d1117;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px 6px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .module-header h3 { font-size: 10pt; font-weight: 600; }
+    .module-count {
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 8pt;
+      background: rgba(255,255,255,0.2);
+    }
+
+    .module-body {
+      border: 1px solid #dee2e6;
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+    }
+
+    .finding {
+      padding: 8px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .finding:last-child { border-bottom: none; }
+    .finding-left h4 { font-size: 9pt; font-weight: 600; margin-bottom: 2px; }
+    .finding-left p  { font-size: 8pt; color: #666; }
+    .finding-right   { display: flex; align-items: center; gap: 8px; }
+    .finding-status  { font-size: 8pt; color: #555; }
+
+    .risk-badge {
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .risk-Critique  { background: #f8d7da; color: #dc3545; }
+    .risk-Majeur    { background: #fff3cd; color: #fd7e14; }
+    .risk-Important { background: #fff3cd; color: #856404; }
+    .risk-Mineur    { background: #cce5ff; color: #004085; }
+    .risk-ok        { background: #d4edda; color: #28a745; }
+
+    /* Footer */
+    .report-footer {
+      margin-top: 30px;
+      padding-top: 15px;
+      border-top: 2px solid #dee2e6;
+      text-align: center;
+      font-size: 8pt;
+      color: #888;
+    }
+
+    /* Section titre */
+    .section-title {
+      font-size: 13pt;
+      font-weight: 700;
+      color: #0d1117;
+      margin: 24px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #58a6ff;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Page de garde -->
+  <div class="cover">
+    <div class="logo">🛡️</div>
+    <div class="company">ShieldScan</div>
+    <div class="slogan">Votre sécurité web, en un scan.</div>
+    <div class="report-title">Rapport d'Audit de Sécurité</div>
+    <div class="report-meta">
+      <strong>Cible :</strong> {{ report.target }}<br>
+      <strong>Date :</strong> {{ report.date }}<br>
+      <strong>ID :</strong> {{ report.id }}<br>
+      <strong>Mode :</strong> {% if report.mode == "advanced" %}Avancé{% else %}Simple{% endif %}
+    </div>
+  </div>
+
+  <!-- Résumé exécutif -->
+  <div class="section-title">📊 Résumé Exécutif</div>
+
+  <div class="score-section">
+    <div class="score-circle grade-{{ report.grade }}">
+      {% if report.score == 0 %}0{% else %}{{ report.score }}{% endif %}
+      <small>/100</small>
+    </div>
+    <div class="score-info">
+      <h2>Grade {{ report.grade }} —
+        {% if report.grade == "A" %}Excellent
+        {% elif report.grade == "B" %}Bon
+        {% elif report.grade == "C" %}Passable
+        {% elif report.grade == "D" %}Insuffisant
+        {% else %}Critique{% endif %}
+      </h2>
+      <p>{{ report.total_findings }} vulnérabilité(s) détectée(s)
+         via {{ report.modules_run | join(", ") }}</p>
+      <div class="stats-row">
+        <span class="stat-badge stat-critique">🔴 Critique : {{ report.stats.Critique }}</span>
+        <span class="stat-badge stat-majeur">🟠 Élevé : {{ report.stats.Majeur }}</span>
+        <span class="stat-badge stat-important">🟡 Moyen : {{ report.stats.Important }}</span>
+        <span class="stat-badge stat-mineur">🔵 Faible : {{ report.stats.Mineur }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Détail par module -->
+  <div class="section-title">📋 Détail des Résultats</div>
+
+  {% for module_name, findings in report.modules_grouped.items() %}
+  {% set has_vulns = findings | selectattr("risk_level") | list | length %}
+
+  <div class="module-section">
+    <div class="module-header">
+      <h3>{{ module_name }}</h3>
+      <span class="module-count">{{ has_vulns }} faille(s)</span>
+    </div>
+    <div class="module-body">
+      {% for f in findings %}
+      <div class="finding">
+        <div class="finding-left">
+          <h4>{{ f.get("label") or f.get("file") or f.get("header") or "Résultat" }}</h4>
+          <p>{{ f.get("description", "") }}</p>
+        </div>
+        <div class="finding-right">
+          <span class="finding-status">{{ f.status }}</span>
+          {% if f.risk_level %}
+            <span class="risk-badge risk-{{ f.risk_level }}">{{ f.risk_level }}</span>
+          {% else %}
+            <span class="risk-badge risk-ok">✅ OK</span>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+
+  <!-- Footer -->
+  <div class="report-footer">
+    Rapport généré par <strong>ShieldScan</strong> — <em>Votre sécurité web, en un scan.</em><br>
+    {{ report.date }} — ID {{ report.id }} — Usage White Hat uniquement
+  </div>
+
+</body>
+</html>
