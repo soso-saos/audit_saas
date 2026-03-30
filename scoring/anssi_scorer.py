@@ -1,9 +1,7 @@
 # =============================================================
 # Moteur de scoring basé sur la matrice de risque ANSSI
-# Croise l'Impact d'une faille avec sa Difficulté d'exploitation
 # =============================================================
 
-# --- Matrice ANSSI : [Impact][Exploitabilité] → Niveau de risque ---
 ANSSI_MATRIX = {
     "Mineur": {
         "Très difficile": "Mineur",
@@ -31,15 +29,14 @@ ANSSI_MATRIX = {
     },
 }
 
-# --- Poids de chaque niveau : points retirés au score global ---
+# Poids recalibrés — plus justes et proportionnés
 RISK_WEIGHTS = {
-    "Mineur":    2,
-    "Important": 5,
-    "Majeur":    10,
-    "Critique":  25,
+    "Mineur":    1,
+    "Important": 3,
+    "Majeur":    6,
+    "Critique":  15,
 }
 
-# --- Couleurs et emojis pour le rapport visuel ---
 RISK_DISPLAY = {
     "Mineur":    {"color": "#3498db", "emoji": "🔵", "label": "Faible"},
     "Important": {"color": "#f39c12", "emoji": "🟠", "label": "Moyen"},
@@ -47,37 +44,59 @@ RISK_DISPLAY = {
     "Critique":  {"color": "#e74c3c", "emoji": "🔴", "label": "Critique"},
 }
 
-# --- Grille de grades (comme SSL Labs) ---
 GRADE_THRESHOLDS = [
-    (90, "A"),   # Excellent  : quasi aucune faille
-    (75, "B"),   # Bien       : quelques points mineurs
-    (40, "C"),   # Passable   : headers manquants, rien de critique
-    (20, "D"),   # Mauvais    : failles importantes présentes
-    (0,  "F"),   # Critique   : site très vulnérable
+    (90, "A"),
+    (75, "B"),
+    (40, "C"),
+    (20, "D"),
+    (0,  "F"),
+]
+
+# Mots-clés Nikto qui dupliquent ce que mod_headers détecte déjà
+# On les filtre pour éviter le double comptage
+NIKTO_HEADER_DUPLICATES = [
+    "strict-transport-security",
+    "x-frame-options",
+    "x-content-type-options",
+    "content-security-policy",
+    "permissions-policy",
+    "referrer-policy",
 ]
 
 
 def get_risk_level(impact: str, exploitability: str) -> str:
-    """Retourne le niveau de risque ANSSI pour une faille donnée."""
     try:
         return ANSSI_MATRIX[impact][exploitability]
     except KeyError:
-        return "Mineur"  # Valeur par défaut si données manquantes
+        return "Mineur"
+
+
+def _is_nikto_header_duplicate(finding: dict) -> bool:
+    """
+    Retourne True si ce finding Nikto signale un header
+    déjà détecté par mod_headers — on évite le double comptage.
+    """
+    if finding.get("source") != "nikto":
+        return False
+    label_lower = finding.get("label", "").lower()
+    return any(keyword in label_lower for keyword in NIKTO_HEADER_DUPLICATES)
 
 
 def score_findings(findings: list) -> dict:
-    """
-    Prend une liste de findings (depuis n'importe quel module)
-    et calcule le score global, le grade et les statistiques.
-
-    Chaque finding doit avoir : impact, exploitability (ou None si pas de faille)
-    """
     score = 100
     stats = {"Mineur": 0, "Important": 0, "Majeur": 0, "Critique": 0}
     scored_findings = []
 
     for finding in findings:
-        # On ne score que les failles réelles (impact non nul)
+        # Filtre les doublons Nikto/Headers
+        if _is_nikto_header_duplicate(finding):
+            scored_findings.append({
+                **finding,
+                "risk_level": None,
+                "deduplicated": True,
+            })
+            continue
+
         if not finding.get("impact") or not finding.get("exploitability"):
             scored_findings.append({**finding, "risk_level": None})
             continue
@@ -94,7 +113,6 @@ def score_findings(findings: list) -> dict:
             "display": RISK_DISPLAY[risk_level],
         })
 
-    # Score plancher à 0
     score = max(0, score)
 
     return {
@@ -107,17 +125,14 @@ def score_findings(findings: list) -> dict:
 
 
 def _get_grade(score: int) -> str:
-    """Convertit un score numérique en grade lettre (A → F)."""
     for threshold, grade in GRADE_THRESHOLDS:
         if score >= threshold:
             return grade
     return "F"
 
 
-# --- Test rapide ---
 if __name__ == "__main__":
     import json
-    # On simule les findings de mod_headers.py
     test_findings = [
         {"header": "HSTS",  "impact": "Important", "exploitability": "Facile"},
         {"header": "CSP",   "impact": "Majeur",    "exploitability": "Facile"},

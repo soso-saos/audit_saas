@@ -38,7 +38,6 @@ DANGEROUS_PORTS = {
            "description": "Base de données MongoDB exposée — souvent sans mot de passe"},
 }
 
-# Versions connues comme vulnérables
 VULNERABLE_VERSIONS = {
     "apache httpd 2.4.25": "CVE-2017-7679 — Vulnérabilité critique connue (très ancienne version)",
     "apache httpd 2.4.49": "CVE-2021-41773 — Path Traversal critique (exploit public disponible)",
@@ -46,14 +45,22 @@ VULNERABLE_VERSIONS = {
 }
 
 
-def _extract_host(target: str) -> str:
+def _extract_host_and_port(target: str) -> tuple:
+    """
+    Extrait l'hôte et le port depuis une URL.
+    Ex: http://localhost:8082 → ('localhost', 8082)
+        https://example.com   → ('example.com', None)
+    """
     host = target.replace("https://", "").replace("http://", "")
-    host = host.split("/")[0].split(":")[0]
-    return host
+    host = host.split("/")[0]
+
+    if ":" in host:
+        parts = host.split(":")
+        return parts[0], int(parts[1])
+    return host, None
 
 
 def _check_version_cve(version: str) -> str | None:
-    """Vérifie si une version est connue comme vulnérable."""
     version_lower = version.lower()
     for vuln_version, cve_info in VULNERABLE_VERSIONS.items():
         if vuln_version in version_lower:
@@ -62,7 +69,7 @@ def _check_version_cve(version: str) -> str | None:
 
 
 def run(target: str) -> dict:
-    host = _extract_host(target)
+    host, target_port = _extract_host_and_port(target)
 
     results = {
         "module": "Scan de Ports (Nmap)",
@@ -71,14 +78,32 @@ def run(target: str) -> dict:
     }
 
     try:
-        print(f"   🔎 Scan nmap sur {host} (top 1000 ports)...")
-
-        cmd = [
-            "nmap", "-sV", "-T3", "--open",
-            "--top-ports", "1000",
-            "-oG", "-",
-            host
-        ]
+        # -------------------------------------------------------
+        # Stratégie de scan adaptée :
+        # - Si un port spécifique est dans l'URL → on scanne
+        #   ce port + les ports standards dangereux uniquement
+        # - Sinon → scan des top 1000 ports habituels
+        # -------------------------------------------------------
+        if target_port and target_port not in [80, 443]:
+            # On scanne le port cible + ports dangereux courants
+            dangerous_port_list = "21,22,23,25,445,1433,3306,3389,5432,6379,27017"
+            ports_to_scan = f"{target_port},{dangerous_port_list}"
+            print(f"   🔎 Scan nmap sur {host} (port cible {target_port} + ports dangereux)...")
+            cmd = [
+                "nmap", "-sV", "-T3", "--open",
+                "-p", ports_to_scan,
+                "-oG", "-",
+                host
+            ]
+        else:
+            # Scan standard top 1000
+            print(f"   🔎 Scan nmap sur {host} (top 1000 ports)...")
+            cmd = [
+                "nmap", "-sV", "-T3", "--open",
+                "--top-ports", "1000",
+                "-oG", "-",
+                host
+            ]
 
         output = subprocess.run(
             cmd, capture_output=True, text=True, timeout=120
@@ -90,7 +115,7 @@ def run(target: str) -> dict:
 
         if not findings:
             results["findings"].append({
-                "label": "Aucun port ouvert détecté",
+                "label": "Aucun port dangereux détecté",
                 "description": "Tous les ports scannés sont fermés ou filtrés",
                 "impact": None,
                 "exploitability": None,
@@ -130,10 +155,9 @@ def _parse_nmap_output(raw: str, host: str) -> list:
             "description": f"Port {port_num} ouvert — service {service} exposé"
         })
 
-        # Vérification CVE sur la version détectée
+        # Vérification CVE
         cve_info = _check_version_cve(version)
         if cve_info:
-            # Une CVE connue → on monte le niveau de risque
             port_info = {**port_info, "impact": "Critique",
                          "exploitability": "Facile",
                          "description": cve_info}
@@ -163,5 +187,6 @@ def _parse_nmap_output(raw: str, host: str) -> list:
 
 if __name__ == "__main__":
     import json
-    output = run("http://localhost:8080")
+    # Test ciblé sur Nginx
+    output = run("http://localhost:8082")
     print(json.dumps(output, indent=2, ensure_ascii=False))
