@@ -1,0 +1,175 @@
+services:
+  kali:
+    build: .
+    container_name: kali
+    stdin_open: true
+    tty: true
+    networks:
+      - auditnet
+    volumes:
+      - ./workspace:/workspace
+    command: tail -f /dev/null
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+
+  wordpress:
+    image: wordpress:latest
+    container_name: wordpress
+    networks:
+      - auditnet
+    depends_on:
+      - wp_db
+    environment:
+      WORDPRESS_DB_HOST: wp_db:3306
+      WORDPRESS_DB_USER: wpuser
+      WORDPRESS_DB_PASSWORD: wppass
+      WORDPRESS_DB_NAME: wordpress
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+  wp_db:
+    image: mariadb:10
+    container_name: wp_db
+    networks:
+      - auditnet
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wpuser
+      MYSQL_PASSWORD: wppass
+    restart: unless-stopped
+
+  dvwa:
+    image: vulnerables/web-dvwa
+    container_name: dvwa
+    depends_on:
+      - dvwa_db
+    networks:
+      - auditnet
+    ports:
+      - "8081:80"
+    restart: unless-stopped
+
+  dvwa_db:
+    image: mariadb:10
+    container_name: dvwa_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: dvwa
+      MYSQL_USER: dvwa
+      MYSQL_PASSWORD: dvwa
+    networks:
+      - auditnet
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    networks:
+      - auditnet
+    ports:
+      - "8082:80"
+    restart: unless-stopped
+
+  juiceshop:
+    image: bkimminich/juice-shop
+    container_name: juiceshop
+    networks:
+      - auditnet
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+  joomla:
+    image: joomla:latest
+    container_name: joomla
+    depends_on:
+      - joomla_db
+    networks:
+      - auditnet
+    environment:
+      JOOMLA_DB_HOST: joomla_db
+      JOOMLA_DB_USER: joomla
+      JOOMLA_DB_PASSWORD: joomla
+      JOOMLA_DB_NAME: joomla
+    ports:
+      - "8083:80"
+    restart: unless-stopped
+
+  joomla_db:
+    image: mariadb:10
+    container_name: joomla_db
+    networks:
+      - auditnet
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: joomla
+      MYSQL_USER: joomla
+      MYSQL_PASSWORD: joomla
+    restart: unless-stopped
+
+  drupal:
+    image: drupal:latest
+    container_name: drupal
+    depends_on:
+      - drupal_db
+    networks:
+      - auditnet
+    ports:
+      - "8084:80"
+    restart: unless-stopped
+
+  drupal_db:
+    image: mariadb:10
+    container_name: drupal_db
+    networks:
+      - auditnet
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: drupal
+      MYSQL_USER: drupal
+      MYSQL_PASSWORD: drupal
+    restart: unless-stopped
+
+  prestashop:
+    image: prestashop/prestashop:latest
+    container_name: prestashop
+    depends_on:
+      - prestashop_db
+    networks:
+      - auditnet
+    environment:
+      DB_SERVER: prestashop_db
+      DB_NAME: prestashop
+      DB_USER: prestashop
+      DB_PASSWD: prestashop
+    ports:
+      - "8085:80"
+    restart: unless-stopped
+
+  prestashop_db:
+    image: mariadb:10
+    container_name: prestashop_db
+    networks:
+      - auditnet
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: prestashop
+      MYSQL_USER: prestashop
+      MYSQL_PASSWORD: prestashop
+    restart: unless-stopped
+
+  liferay:
+    image: liferay/portal:latest
+    container_name: liferay
+    networks:
+      - auditnet
+    ports:
+      - "8086:8080"
+    restart: unless-stopped
+
+networks:
+  auditnet:
+    driver: bridge
