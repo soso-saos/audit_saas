@@ -48,52 +48,48 @@
     .download-btn:hover { background: #2ea043; }
 
     /* Score card */
-    .score-card {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 12px;
-      padding: 32px;
-      display: flex;
-      align-items: center;
-      gap: 32px;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-    }
-    .score-circle {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.2rem;
-      font-weight: 700;
-      flex-shrink: 0;
-      transition: all 0.3s;
-    }
-    .score-circle small { font-size: 0.75rem; font-weight: 400; }
-    .grade-A { background: #1a3a2a; color: #3fb950; border: 3px solid #3fb950; }
-    .grade-B { background: #1a2a3a; color: #58a6ff; border: 3px solid #58a6ff; }
-    .grade-C { background: #2d2a1a; color: #d29922; border: 3px solid #d29922; }
-    .grade-D { background: #2d1f1a; color: #f0883e; border: 3px solid #f0883e; }
-    .grade-F { background: #2d1a1a; color: #f85149; border: 3px solid #f85149; }
+    <!-- Score global -->
+  <div class="score-card">
+    <div class="score-circle grade-{{ report.grade }}">
+      {% if report.score == 0 %}0{% else %}{{ report.score }}{% endif %}
+      <small>/100</small>
+    </div>
+    <div class="score-info">
+      <h2>Grade {{ report.grade }} —
+        {% if report.grade == "A" %}Excellent
+        {% elif report.grade == "B" %}Bon
+        {% elif report.grade == "C" %}Passable
+        {% elif report.grade == "D" %}Insuffisant
+        {% else %}Critique{% endif %}
+      </h2>
 
-    .score-info h2 { font-size: 1.4rem; margin-bottom: 8px; }
-    .score-info p  { color: #8b949e; font-size: 0.9rem; margin-bottom: 12px; }
+      {% if report.cms_detected %}
+      <div style="margin-bottom:10px;">
+        <span style="
+          display:inline-block;
+          padding:5px 14px;
+          border-radius:16px;
+          font-size:0.85rem;
+          font-weight:600;
+          background:#1c2128;
+          border:1px solid #30363d;
+          color:#e6edf3;">
+          {{ report.cms_detected.icon }}  CMS détecté : {{ report.cms_detected.cms_name }}
+          <span style="color:#8b949e;font-weight:400;"> — Confiance {{ report.cms_detected.confidence }}%</span>
+        </span>
+      </div>
+      {% endif %}
 
-    .stats-row { display: flex; gap: 10px; flex-wrap: wrap; }
-    .stat-badge {
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 600;
-    }
-    .stat-critique  { background: #2d1a1a; color: #f85149; }
-    .stat-majeur    { background: #2d1f1a; color: #f0883e; }
-    .stat-important { background: #2d2a1a; color: #d29922; }
-    .stat-mineur    { background: #1a2a3a; color: #58a6ff; }
-
+      <p>{{ report.total_findings }} vulnérabilité(s) détectée(s)
+         sur {{ report.modules_grouped | length }} module(s)</p>
+      <div class="stats-row">
+        <span class="stat-badge stat-critique">🔴 Critique : {{ report.stats.Critique }}</span>
+        <span class="stat-badge stat-majeur">🟠 Élevé : {{ report.stats.Majeur }}</span>
+        <span class="stat-badge stat-important">🟡 Moyen : {{ report.stats.Important }}</span>
+        <span class="stat-badge stat-mineur">🔵 Faible : {{ report.stats.Mineur }}</span>
+      </div>
+    </div>
+  </div>
     /* Modules groupés */
     .module-section { margin-bottom: 28px; }
 

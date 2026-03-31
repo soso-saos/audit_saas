@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -67,7 +68,7 @@
       color: #555;
     }
 
-    /* Score */
+    /* Score Section - diletak di bawah summary */
     .score-section {
       display: flex;
       align-items: center;
@@ -140,25 +141,47 @@
       border-radius: 0 0 6px 6px;
     }
 
-    .finding {
-      padding: 8px 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #f0f0f0;
+    /* TABLE STYLE - FIXED */
+    .findings-table {
+      width: 100%;
+      border-collapse: collapse;
     }
-    .finding:last-child { border-bottom: none; }
-    .finding-left h4 { font-size: 9pt; font-weight: 600; margin-bottom: 2px; }
-    .finding-left p  { font-size: 8pt; color: #666; }
-    .finding-right   { display: flex; align-items: center; gap: 8px; }
-    .finding-status  { font-size: 8pt; color: #555; }
+    .findings-table th {
+      background: #f1f3f5;
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 8.5pt;
+      font-weight: 600;
+      color: #1e2a3a;
+      border-bottom: 1px solid #dee2e6;
+    }
+    .findings-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #f0f0f0;
+      vertical-align: middle;
+    }
+    .findings-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .finding-desc {
+      font-size: 9pt;
+      font-weight: 500;
+      margin-bottom: 3px;
+    }
+    .finding-detail {
+      font-size: 8pt;
+      color: #6c757d;
+    }
 
     .risk-badge {
-      padding: 2px 8px;
-      border-radius: 8px;
-      font-size: 7.5pt;
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-size: 8pt;
       font-weight: 700;
-      white-space: nowrap;
+      text-align: center;
+      min-width: 80px;
     }
     .risk-Critique  { background: #f8d7da; color: #dc3545; }
     .risk-Majeur    { background: #fff3cd; color: #fd7e14; }
@@ -166,14 +189,13 @@
     .risk-Mineur    { background: #cce5ff; color: #004085; }
     .risk-ok        { background: #d4edda; color: #28a745; }
 
-    /* Footer */
-    .report-footer {
-      margin-top: 30px;
-      padding-top: 15px;
-      border-top: 2px solid #dee2e6;
-      text-align: center;
-      font-size: 8pt;
-      color: #888;
+    .status-ok {
+      display: inline-block;
+      padding: 2px 10px;
+      background: #e9ecef;
+      border-radius: 12px;
+      font-size: 7.5pt;
+      color: #495057;
     }
 
     /* Section titre */
@@ -184,6 +206,15 @@
       margin: 24px 0 12px;
       padding-bottom: 6px;
       border-bottom: 2px solid #58a6ff;
+    }
+
+    .report-footer {
+      margin-top: 30px;
+      padding-top: 15px;
+      border-top: 2px solid #dee2e6;
+      text-align: center;
+      font-size: 8pt;
+      color: #888;
     }
   </style>
 </head>
@@ -203,7 +234,7 @@
     </div>
   </div>
 
-  <!-- Résumé exécutif -->
+  <!-- Résumé Exécutif + Score -->
   <div class="section-title">📊 Résumé Exécutif</div>
 
   <div class="score-section">
@@ -230,34 +261,55 @@
     </div>
   </div>
 
-  <!-- Détail par module -->
+  <!-- Détail par module avec TABLE -->
   <div class="section-title">📋 Détail des Résultats</div>
 
   {% for module_name, findings in report.modules_grouped.items() %}
-  {% set has_vulns = findings | selectattr("risk_level") | list | length %}
-
   <div class="module-section">
     <div class="module-header">
       <h3>{{ module_name }}</h3>
-      <span class="module-count">{{ has_vulns }} faille(s)</span>
+      <span class="module-count">{{ findings | length }} élément(s)</span>
     </div>
     <div class="module-body">
-      {% for f in findings %}
-      <div class="finding">
-        <div class="finding-left">
-          <h4>{{ f.get("label") or f.get("file") or f.get("header") or "Résultat" }}</h4>
-          <p>{{ f.get("description", "") }}</p>
-        </div>
-        <div class="finding-right">
-          <span class="finding-status">{{ f.status }}</span>
-          {% if f.risk_level %}
-            <span class="risk-badge risk-{{ f.risk_level }}">{{ f.risk_level }}</span>
-          {% else %}
-            <span class="risk-badge risk-ok">✅ OK</span>
-          {% endif %}
-        </div>
-      </div>
-      {% endfor %}
+      <table class="findings-table">
+        <thead>
+          <tr>
+            <th style="width: 45%">Élément / Vulnérabilité</th>
+            <th style="width: 30%">Description</th>
+            <th style="width: 15%">Statut</th>
+            <th style="width: 10%">Risque</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in findings %}
+          <tr>
+            <td>
+              <div class="finding-desc">{{ f.get("label") or f.get("file") or f.get("header") or f.get("titre") or "Résultat" }}</div>
+              {% if f.get("cve_id") %}
+              <div class="finding-detail">CVE: {{ f.cve_id }}</div>
+              {% endif %}
+            </td>
+            <td>
+              <div class="finding-detail">{{ f.get("description", "") }}</div>
+            </td>
+            <td>
+              {% if f.status %}
+                <span class="status-ok">{{ f.status }}</span>
+              {% else %}
+                <span class="status-ok">Détecté</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if f.risk_level %}
+                <span class="risk-badge risk-{{ f.risk_level }}">{{ f.risk_level }}</span>
+              {% else %}
+                <span class="risk-badge risk-ok">✅ OK</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
   {% endfor %}
