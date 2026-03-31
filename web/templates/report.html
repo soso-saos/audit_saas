@@ -3,278 +3,220 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rapport — {{ report.target }}</title>
+  <title>ShieldScan — Rapport {{ report.target }}</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #0d1117;
-      color: #e6edf3;
-      padding: 40px 20px;
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Sora:wght@400;500;600;700;800&display=swap');
+    :root {
+      --bg:#0a0e14; --bg2:#0f1419; --panel:#141c26; --panel2:#1a2332;
+      --border:#1e2d3d; --border2:#253447; --blue:#4d9de0;
+      --green:#3ddc84; --red:#ff4757; --orange:#ff9f43;
+      --yellow:#feca57; --white:#e8f0fe; --grey:#6b7d93; --grey2:#3d5068;
     }
-    .container { max-width: 960px; margin: 0 auto; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Sora',sans-serif; background:var(--bg); color:var(--white); min-height:100vh; overflow-x:hidden; }
+    body::before {
+      content:''; position:fixed; top:-50%; left:-50%; width:200%; height:200%;
+      background:
+        radial-gradient(ellipse 80% 40% at 20% 10%, rgba(77,157,224,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 30% at 80% 80%, rgba(61,220,132,0.04) 0%, transparent 50%);
+      pointer-events:none; z-index:0;
+    }
+    .container { max-width:1000px; margin:0 auto; padding:32px 24px 60px; position:relative; z-index:1; }
 
-    /* Header */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 32px;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-    .header h1 { font-size: 1.5rem; color: #58a6ff; }
-    .header small { color: #8b949e; display: block; font-size: 0.85rem; }
-    .back-btn {
-      padding: 8px 16px;
-      background: #21262d;
-      border: 1px solid #30363d;
-      border-radius: 6px;
-      color: #e6edf3;
-      text-decoration: none;
-      font-size: 0.9rem;
-    }
-    .back-btn:hover { background: #30363d; }
-    .download-btn {
-      padding: 8px 16px;
-      background: #238636;
-      border: 1px solid #2ea043;
-      border-radius: 6px;
-      color: white;
-      text-decoration: none;
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
-    .download-btn:hover { background: #2ea043; }
+    /* TOPBAR */
+    .topbar { display:flex; justify-content:space-between; align-items:center; padding:14px 20px; background:var(--panel); border:1px solid var(--border); border-radius:12px; margin-bottom:28px; flex-wrap:wrap; gap:12px; }
+    .brand { display:flex; align-items:center; gap:10px; }
+    .brand-icon { width:36px; height:36px; background:linear-gradient(135deg,var(--blue),#2563eb); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+    .brand-name { font-size:1.05rem; font-weight:700; color:var(--white); }
+    .brand-meta { font-size:0.75rem; color:var(--grey); font-family:'JetBrains Mono',monospace; margin-top:1px; }
+    .topbar-actions { display:flex; gap:10px; flex-wrap:wrap; }
+    .btn { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:8px; font-size:0.82rem; font-weight:600; text-decoration:none; transition:all .2s; white-space:nowrap; font-family:'Sora',sans-serif; }
+    .btn-primary { background:linear-gradient(135deg,#1a7adb,#1556a8); border:1px solid rgba(77,157,224,0.4); color:white; }
+    .btn-primary:hover { background:linear-gradient(135deg,#2589ea,#1a69c4); transform:translateY(-1px); }
+    .btn-secondary { background:var(--panel2); border:1px solid var(--border2); color:var(--grey); }
+    .btn-secondary:hover { color:var(--white); border-color:var(--grey2); }
 
-    /* Score card */
-    <!-- Score global -->
-  <div class="score-card">
-    <div class="score-circle grade-{{ report.grade }}">
-      {% if report.score == 0 %}0{% else %}{{ report.score }}{% endif %}
-      <small>/100</small>
-    </div>
-    <div class="score-info">
-      <h2>Grade {{ report.grade }} —
-        {% if report.grade == "A" %}Excellent
-        {% elif report.grade == "B" %}Bon
-        {% elif report.grade == "C" %}Passable
-        {% elif report.grade == "D" %}Insuffisant
-        {% else %}Critique{% endif %}
-      </h2>
+    /* HERO */
+    .hero { display:grid; grid-template-columns:auto 1fr; gap:28px; align-items:center; padding:28px 32px; background:var(--panel); border:1px solid var(--border); border-radius:16px; margin-bottom:16px; position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--blue),var(--green)); }
+    .score-ring { position:relative; width:110px; height:110px; flex-shrink:0; }
+    .score-ring svg { width:110px; height:110px; transform:rotate(-90deg); }
+    .score-ring .track { fill:none; stroke:var(--border2); stroke-width:7; }
+    .score-ring .fill { fill:none; stroke-width:7; stroke-linecap:round; }
+    .score-ring .fill.A { stroke:#3ddc84; }
+    .score-ring .fill.B { stroke:#4d9de0; }
+    .score-ring .fill.C { stroke:#feca57; }
+    .score-ring .fill.D { stroke:#ff9f43; }
+    .score-ring .fill.F { stroke:#ff4757; }
+    .score-inner { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; }
+    .score-number { font-size:1.8rem; font-weight:800; line-height:1; }
+    .score-number.A { color:#3ddc84; } .score-number.B { color:#4d9de0; }
+    .score-number.C { color:#feca57; } .score-number.D { color:#ff9f43; }
+    .score-number.F { color:#ff4757; }
+    .score-sub { font-size:0.65rem; color:var(--grey); font-family:'JetBrains Mono',monospace; }
+    .hero-info { min-width:0; }
+    .grade-line { font-size:1.35rem; font-weight:700; margin-bottom:8px; }
+    .grade-line .grade-letter { display:inline-block; padding:2px 10px; border-radius:6px; font-family:'JetBrains Mono',monospace; font-size:1rem; margin-left:8px; }
+    .grade-A .grade-letter { background:rgba(61,220,132,0.15); color:#3ddc84; }
+    .grade-B .grade-letter { background:rgba(77,157,224,0.15); color:#4d9de0; }
+    .grade-C .grade-letter { background:rgba(254,202,87,0.15);  color:#feca57; }
+    .grade-D .grade-letter { background:rgba(255,159,67,0.15);  color:#ff9f43; }
+    .grade-F .grade-letter { background:rgba(255,71,87,0.15);   color:#ff4757; }
+    .cms-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; background:var(--panel2); border:1px solid var(--border2); border-radius:20px; font-size:0.78rem; color:var(--white); margin-bottom:12px; }
+    .cms-badge .cms-conf { color:var(--grey); font-size:0.72rem; }
+    .stats-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+    .stat-chip { display:inline-flex; align-items:center; gap:5px; padding:4px 11px; border-radius:20px; font-size:0.78rem; font-weight:600; font-family:'JetBrains Mono',monospace; }
+    .stat-chip.crit { background:rgba(255,71,87,0.12);  color:#ff4757; border:1px solid rgba(255,71,87,0.25); }
+    .stat-chip.high { background:rgba(255,159,67,0.12); color:#ff9f43; border:1px solid rgba(255,159,67,0.25); }
+    .stat-chip.med  { background:rgba(254,202,87,0.12); color:#feca57; border:1px solid rgba(254,202,87,0.25); }
+    .stat-chip.low  { background:rgba(77,157,224,0.12); color:#4d9de0; border:1px solid rgba(77,157,224,0.25); }
 
-      {% if report.cms_detected %}
-      <div style="margin-bottom:10px;">
-        <span style="
-          display:inline-block;
-          padding:5px 14px;
-          border-radius:16px;
-          font-size:0.85rem;
-          font-weight:600;
-          background:#1c2128;
-          border:1px solid #30363d;
-          color:#e6edf3;">
-          {{ report.cms_detected.icon }}  CMS détecté : {{ report.cms_detected.cms_name }}
-          <span style="color:#8b949e;font-weight:400;"> — Confiance {{ report.cms_detected.confidence }}%</span>
-        </span>
-      </div>
-      {% endif %}
+    /* MODULES BAR */
+    .modules-bar { display:flex; flex-wrap:wrap; gap:7px; padding:14px 20px; background:var(--panel); border:1px solid var(--border); border-radius:10px; margin-bottom:24px; }
+    .mod-pill { display:inline-flex; align-items:center; gap:5px; padding:3px 11px; background:var(--panel2); border:1px solid var(--border2); border-radius:20px; font-size:0.75rem; color:var(--grey); }
+    .mod-pill .dot { width:6px; height:6px; border-radius:50%; background:var(--green); flex-shrink:0; }
 
-      <p>{{ report.total_findings }} vulnérabilité(s) détectée(s)
-         sur {{ report.modules_grouped | length }} module(s)</p>
-      <div class="stats-row">
-        <span class="stat-badge stat-critique">🔴 Critique : {{ report.stats.Critique }}</span>
-        <span class="stat-badge stat-majeur">🟠 Élevé : {{ report.stats.Majeur }}</span>
-        <span class="stat-badge stat-important">🟡 Moyen : {{ report.stats.Important }}</span>
-        <span class="stat-badge stat-mineur">🔵 Faible : {{ report.stats.Mineur }}</span>
-      </div>
-    </div>
-  </div>
-    /* Modules groupés */
-    .module-section { margin-bottom: 28px; }
+    /* MODULE SECTIONS */
+    .module-section { margin-bottom:12px; }
+    .module-header { display:flex; align-items:center; justify-content:space-between; padding:13px 20px; background:var(--panel); border:1px solid var(--border); border-radius:10px; cursor:pointer; user-select:none; transition:background .15s, border-color .15s; }
+    .module-header:hover { background:var(--panel2); border-color:var(--border2); }
+    .module-header.open { border-radius:10px 10px 0 0; border-bottom-color:transparent; }
+    .module-title { font-size:0.9rem; font-weight:600; color:var(--white); display:flex; align-items:center; gap:8px; }
+    .module-right { display:flex; align-items:center; gap:10px; }
+    .vuln-count { padding:2px 9px; border-radius:10px; font-size:0.72rem; font-weight:700; font-family:'JetBrains Mono',monospace; background:var(--panel2); color:var(--grey); border:1px solid var(--border2); }
+    .vuln-count.has-crit { background:rgba(255,71,87,0.12); color:#ff4757; border-color:rgba(255,71,87,0.3); }
+    .vuln-count.has-high { background:rgba(255,159,67,0.12); color:#ff9f43; border-color:rgba(255,159,67,0.3); }
+    .chevron { color:var(--grey); font-size:0.75rem; transition:transform .25s; }
+    .chevron.open { transform:rotate(180deg); }
+    .module-body { border:1px solid var(--border); border-top:none; border-radius:0 0 10px 10px; overflow:hidden; display:none; }
+    .module-body.open { display:block; }
 
-    .module-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 20px;
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 10px 10px 0 0;
-      cursor: pointer;
-      user-select: none;
-    }
-    .module-header:hover { background: #1c2128; }
-    .module-header h3 {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #e6edf3;
-    }
-    .module-meta {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .module-count {
-      padding: 3px 10px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      background: #21262d;
-      color: #8b949e;
-    }
-    .module-count.has-critical { background: #2d1a1a; color: #f85149; }
-    .module-count.has-major    { background: #2d1f1a; color: #f0883e; }
-    .chevron { color: #8b949e; font-size: 0.9rem; transition: transform 0.2s; }
+    /* FINDINGS */
+    .finding { display:flex; justify-content:space-between; align-items:center; padding:12px 20px; gap:12px; border-bottom:1px solid var(--border); transition:background .15s; flex-wrap:wrap; }
+    .finding:last-child { border-bottom:none; }
+    .finding:hover { background:rgba(255,255,255,0.02); }
+    .finding-left { flex:1; min-width:0; }
+    .finding-label { font-size:0.855rem; font-weight:500; color:var(--white); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:3px; }
+    .finding-desc { font-size:0.76rem; color:var(--grey); line-height:1.4; }
+    .finding-right { display:flex; align-items:center; gap:8px; flex-shrink:0; flex-wrap:wrap; justify-content:flex-end; }
+    .finding-status { font-size:0.76rem; color:var(--grey); font-family:'JetBrains Mono',monospace; white-space:nowrap; }
+    .risk-badge { padding:2px 9px; border-radius:8px; font-size:0.72rem; font-weight:700; white-space:nowrap; font-family:'JetBrains Mono',monospace; }
+    .risk-Critique  { background:rgba(255,71,87,0.12);  color:#ff4757; border:1px solid rgba(255,71,87,0.3); }
+    .risk-Majeur    { background:rgba(255,159,67,0.12); color:#ff9f43; border:1px solid rgba(255,159,67,0.3); }
+    .risk-Important { background:rgba(254,202,87,0.12); color:#feca57; border:1px solid rgba(254,202,87,0.3); }
+    .risk-Mineur    { background:rgba(77,157,224,0.12); color:#4d9de0; border:1px solid rgba(77,157,224,0.3); }
+    .risk-ok        { background:rgba(61,220,132,0.08); color:#3ddc84; border:1px solid rgba(61,220,132,0.2); }
 
-    .module-body {
-      border: 1px solid #30363d;
-      border-top: none;
-      border-radius: 0 0 10px 10px;
-      overflow: hidden;
-    }
+    /* FOOTER */
+    .footer { text-align:center; margin-top:48px; padding-top:24px; border-top:1px solid var(--border); color:var(--grey); font-size:0.78rem; line-height:1.7; }
+    .footer strong { color:var(--blue); }
 
-    /* Findings */
-    .finding {
-      padding: 14px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      border-bottom: 1px solid #21262d;
-    }
-    .finding:last-child { border-bottom: none; }
-    .finding:hover { background: #1c2128; }
-    .finding-left h4 { font-size: 0.9rem; margin-bottom: 3px; font-weight: 500; }
-    .finding-left p  { font-size: 0.8rem; color: #8b949e; }
-    .finding-right   { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .finding-status  { font-size: 0.82rem; color: #8b949e; }
-
-    .risk-badge {
-      padding: 3px 10px;
-      border-radius: 10px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-    .risk-Critique  { background: #2d1a1a; color: #f85149; }
-    .risk-Majeur    { background: #2d1f1a; color: #f0883e; }
-    .risk-Important { background: #2d2a1a; color: #d29922; }
-    .risk-Mineur    { background: #1a2a3a; color: #58a6ff; }
-    .risk-ok        { background: #1a3a2a; color: #3fb950; }
-
-    /* Résumé modules */
-    .modules-summary {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 24px;
-    }
-    .module-pill {
-      padding: 5px 12px;
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      color: #8b949e;
-    }
-
-    /* Footer */
-    .footer {
-      text-align: center;
-      margin-top: 40px;
-      color: #8b949e;
-      font-size: 0.82rem;
-      padding-top: 20px;
-      border-top: 1px solid #21262d;
+    @media (max-width:600px) {
+      .hero { grid-template-columns:1fr; text-align:center; }
+      .score-ring { margin:0 auto; }
+      .stats-row, .cms-badge { justify-content:center; }
     }
   </style>
 </head>
 <body>
 <div class="container">
 
-  <!-- Header -->
-  <div class="header">
-    <div>
-      <h1>🛡️ ShieldScan — Rapport d'audit de sécurité</h1>
-      <small>
-        {{ report.target }} — {{ report.date }} — ID : {{ report.id }}
-        &nbsp;|&nbsp; Mode :
-        {% if report.mode == "advanced" %}⚡ Avancé{% else %}🔍 Simple{% endif %}
-      </small>
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon">🛡️</div>
+      <div>
+        <div class="brand-name">ShieldScan — Rapport d'audit de sécurité</div>
+        <div class="brand-meta">
+          {{ report.target }} &nbsp;·&nbsp; {{ report.date }} &nbsp;·&nbsp; ID : {{ report.id }}
+          &nbsp;·&nbsp; Mode : {% if report.mode == "advanced" %}⚡ Avancé{% else %}🔍 Simple{% endif %}
+        </div>
+      </div>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <a href="/download/{{ report.id }}" class="download-btn">⬇️ Télécharger PDF</a>
-      <a href="/" class="back-btn">← Nouvel audit</a>
+    <div class="topbar-actions">
+      <a href="/download/{{ report.id }}" class="btn btn-primary">⬇️ Télécharger PDF</a>
+      <a href="/" class="btn btn-secondary">← Nouvel audit</a>
     </div>
   </div>
 
-  <!-- Score global -->
-  <div class="score-card">
-    <div class="score-circle grade-{{ report.grade }}">
-      {% if report.score == 0 %}0{% else %}{{ report.score }}{% endif %}
-      <small>/100</small>
+  <div class="hero grade-{{ report.grade }}">
+    <div class="score-ring">
+      {% set r = 48 %}
+      {% set circ = 2 * 3.14159 * r %}
+      {% set pct = report.score / 100 %}
+      {% set offset = circ * (1 - pct) %}
+      <svg viewBox="0 0 110 110">
+        <circle class="track" cx="55" cy="55" r="{{ r }}"/>
+        <circle class="fill {{ report.grade }}" cx="55" cy="55" r="{{ r }}"
+          stroke-dasharray="{{ circ }}" stroke-dashoffset="{{ offset }}"/>
+      </svg>
+      <div class="score-inner">
+        <div class="score-number {{ report.grade }}">{{ report.score }}</div>
+        <div class="score-sub">/100</div>
+      </div>
     </div>
-    <div class="score-info">
-      <h2>Grade {{ report.grade }} —
+    <div class="hero-info">
+      <div class="grade-line">
+        Grade <span class="grade-letter">{{ report.grade }}</span> —
         {% if report.grade == "A" %}Excellent
         {% elif report.grade == "B" %}Bon
         {% elif report.grade == "C" %}Passable
         {% elif report.grade == "D" %}Insuffisant
         {% else %}Critique{% endif %}
-      </h2>
-      <p>{{ report.total_findings }} vulnérabilité(s) détectée(s)
-         sur {{ report.modules_grouped | length }} module(s)</p>
+      </div>
+      {% if report.cms_detected %}
+      <div class="cms-badge">
+        <span>{{ report.cms_detected.icon }}</span>
+        <span>CMS détecté : <strong>{{ report.cms_detected.cms_name }}</strong></span>
+        <span class="cms-conf">— Confiance {{ report.cms_detected.confidence }}%</span>
+      </div>
+      {% endif %}
+      <div style="font-size:0.82rem;color:var(--grey);margin-bottom:4px;">
+        {{ report.total_findings }} vulnérabilité(s) sur {{ report.modules_grouped | length }} module(s) analysés
+      </div>
       <div class="stats-row">
-        <span class="stat-badge stat-critique">🔴 Critique : {{ report.stats.Critique }}</span>
-        <span class="stat-badge stat-majeur">🟠 Élevé : {{ report.stats.Majeur }}</span>
-        <span class="stat-badge stat-important">🟡 Moyen : {{ report.stats.Important }}</span>
-        <span class="stat-badge stat-mineur">🔵 Faible : {{ report.stats.Mineur }}</span>
+        <span class="stat-chip crit">🔴 Critique : {{ report.stats.Critique }}</span>
+        <span class="stat-chip high">🟠 Élevé : {{ report.stats.Majeur }}</span>
+        <span class="stat-chip med">🟡 Moyen : {{ report.stats.Important }}</span>
+        <span class="stat-chip low">🔵 Faible : {{ report.stats.Mineur }}</span>
       </div>
     </div>
   </div>
 
-  <!-- Modules utilisés -->
-  <div class="modules-summary">
+  <div class="modules-bar">
     {% for m in report.modules_run %}
-    <span class="module-pill">✅ {{ m }}</span>
+    <span class="mod-pill"><span class="dot"></span>{{ m }}</span>
     {% endfor %}
   </div>
 
-  <!-- Findings groupés par module -->
   {% for module_name, findings in report.modules_grouped.items() %}
-
   {% set has_vulns = findings | selectattr("risk_level") | list | length %}
-  {% set has_critique = findings | selectattr("risk_level", "equalto", "Critique") | list | length %}
-  {% set has_major = findings | selectattr("risk_level", "equalto", "Majeur") | list | length %}
-
+  {% set has_crit  = findings | selectattr("risk_level", "equalto", "Critique") | list | length %}
+  {% set has_high  = findings | selectattr("risk_level", "equalto", "Majeur")   | list | length %}
   <div class="module-section">
-    <div class="module-header" onclick="toggle('{{ loop.index }}')">
-      <h3>{{ module_name }}</h3>
-      <div class="module-meta">
-        <span class="module-count
-          {% if has_critique %}has-critical
-          {% elif has_major %}has-major{% endif %}">
+    <div class="module-header" onclick="toggle({{ loop.index }})">
+      <div class="module-title">{{ module_name }}</div>
+      <div class="module-right">
+        <span class="vuln-count {% if has_crit %}has-crit{% elif has_high %}has-high{% endif %}">
           {{ has_vulns }} faille(s)
         </span>
-        <span class="chevron" id="chevron-{{ loop.index }}">▼</span>
+        <span class="chevron" id="chev-{{ loop.index }}">▼</span>
       </div>
     </div>
-
     <div class="module-body" id="body-{{ loop.index }}">
       {% for f in findings %}
       <div class="finding">
         <div class="finding-left">
-          <h4>{{ f.get("label") or f.get("file") or f.get("header") or "Résultat" }}</h4>
-          <p>{{ f.get("description", "") }}</p>
+          <div class="finding-label" title="{{ f.get('label') or f.get('file') or f.get('header') or 'Résultat' }}">
+            {{ f.get("label") or f.get("file") or f.get("header") or "Résultat" }}
+          </div>
+          <div class="finding-desc">{{ f.get("description", "") }}</div>
         </div>
         <div class="finding-right">
           <span class="finding-status">{{ f.status }}</span>
           {% if f.risk_level %}
             <span class="risk-badge risk-{{ f.risk_level }}">{{ f.risk_level }}</span>
-          {% else %}
-            <span class="risk-badge risk-ok">✅ OK</span>
+          {% elif not f.get("deduplicated") %}
+            <span class="risk-badge risk-ok">OK</span>
           {% endif %}
         </div>
       </div>
@@ -285,17 +227,19 @@
 
   <div class="footer">
     Rapport généré par <strong>ShieldScan</strong> — <em>Votre sécurité web, en un scan.</em><br>
-    {{ report.date }} — ID {{ report.id }}
+    {{ report.date }} — ID {{ report.id }} — Usage White Hat uniquement
   </div>
 </div>
-
 <script>
+  document.addEventListener('DOMContentLoaded', () => { toggle(1); });
   function toggle(id) {
-    const body    = document.getElementById('body-' + id);
-    const chevron = document.getElementById('chevron-' + id);
-    const isOpen  = body.style.display !== 'none';
-    body.style.display  = isOpen ? 'none' : 'block';
-    chevron.textContent = isOpen ? '▶' : '▼';
+    const body = document.getElementById('body-' + id);
+    const chev = document.getElementById('chev-' + id);
+    const hdr  = body.previousElementSibling;
+    const open = body.classList.contains('open');
+    body.classList.toggle('open', !open);
+    hdr.classList.toggle('open', !open);
+    chev.classList.toggle('open', !open);
   }
 </script>
 </body>
